@@ -1,43 +1,88 @@
-# rtos_project
+# Air Quality Monitor - STM32 RTOS Project
 
-This repository contains the reference project used in the course:
+A production-quality embedded system for indoor air quality monitoring, built on the STM32F446RE microcontroller with FreeRTOS and Modbus RTU communication.
 
-**Advanced Embedded Software with STM32, FreeRTOS & Modbus**
+## Project Overview
 
-The project demonstrates how to structure and implement an embedded software application using an STM32F446RE microcontroller, FreeRTOS, sensor integration and a custom Modbus RTU stack.
+This firmware implements a complete air quality sensor system that acquires environmental data (temperature, humidity, VOC index), logs it to non-volatile memory, and exposes it via Modbus RTU for remote monitoring and control.
 
----
+## Technical Architecture
 
-## About the Project
+**Hardware Platform:**
+- **MCU:** STM32F446RE (ARM Cortex-M4, 180 MHz)
+- **Sensors:** Sensirion SHT3x (temperature/humidity), SGP40 (VOC index)
+- **Storage:** SPI FRAM for non-volatile data logging
+- **Communication:** UART-based Modbus RTU slave
 
-The code in this repository is designed as a **learning and reference project**, focusing on:
+**Software Stack:**
+- **RTOS:** FreeRTOS with custom task architecture
+- **Drivers:** Register-level peripheral drivers using CMSIS (no HAL)
+- **Communication Protocol:** Custom Modbus RTU implementation
+- **Development:** Bare-metal embedded C with modular architecture
 
-- STM32 register-level development using CMSIS
-- FreeRTOS task design and synchronization mechanisms
-- Interrupt-driven peripheral control (UART, SPI, I2C, DMA, etc.)
-- Environmental sensor integration
-- FRAM-based data logging
-- A modular Modbus RTU slave implementation
+## Key Features & Technical Skills Demonstrated
 
-The emphasis is on **code structure, clarity, and maintainability**, rather than minimal examples.
+### Low-Level Firmware Development
+- **Register-level peripheral drivers** for GPIO, UART, SPI, I2C using CMSIS
+- **Interrupt-driven communication** with DMA support
+- **Hardware abstraction layers** for sensor and storage interfaces
+- **Clock tree configuration** and power management
 
----
+### Real-Time Operating System (FreeRTOS)
+- **Multi-task architecture** with 5 concurrent application tasks:
+  - Sensor Data Acquisition Task
+  - System Health Monitor Task
+  - Error Handler Task
+  - Modbus Slave Task
+  - Modbus Data Manager Task
+- **Synchronization mechanisms:** Queues, semaphores, mutexes, task notifications, event groups
+- **Non-blocking peripheral drivers** using RTOS primitives
+- **Watchdog integration** for fault recovery
 
-## Course Context
+### Communication & Data Management
+- **Custom Modbus RTU slave** implementation with register mapping
+- **SPI FRAM driver** for reliable data logging
+- **I2C sensor drivers** with error handling and retry logic
+- **Structured data flow** between tasks using queues and shared memory
 
-This repository accompanies the Udemy course:
+### Professional Software Engineering Practices
+- **Modular architecture** with clear separation of concerns
+- **Scalable design patterns** for embedded systems
+- **Comprehensive error handling** and fault detection
+- **Production-ready code structure** suitable for commercial products
 
-**Advanced Embedded Software with STM32, FreeRTOS & Modbus**
+## Technology Stack
 
-The course provides step-by-step explanations of the architecture, design decisions, and implementation details shown here.
+| Layer | Technology |
+|-------|-----------|
+| **Hardware** | STM32F446RE, Sensirion sensors, SPI FRAM |
+| **RTOS** | FreeRTOS (tasks, queues, semaphores, mutexes) |
+| **Peripherals** | UART, SPI, I2C, ADC, DMA, Timers, GPIO |
+| **Protocol** | Modbus RTU slave |
+| **Language** | Embedded C |
+| **Toolchain** | ARM GCC, STM32CubeIDE |
 
-👉 Course page:  
-https://www.udemy.com/course/advanced-embedded-software-with-stm32-freertos-modbus/
+## System Architecture
 
----
+```
+┌─────────────────────────────────────────────┐
+│          FreeRTOS Application Layer          │
+├─────────────────────────────────────────────┤
+│  Sensor Task  │  Health Monitor  │  Modbus   │
+│  Error Handler │  Data Manager               │
+├─────────────────────────────────────────────┤
+│        Custom Peripheral Drivers             │
+│    (UART, SPI, I2C, GPIO, ADC, Timers)      │
+├─────────────────────────────────────────────┤
+│              CMSIS Core                      │
+├─────────────────────────────────────────────┤
+│            STM32F446RE Hardware              │
+└─────────────────────────────────────────────┘
+```
 
-## Notes
+## Project Highlights
 
-- This repository is primarily intended for learners enrolled in the course.
-- Some files may reference concepts explained in specific lessons.
-- The project may evolve over time as the course is refined and expanded.
+- **Production-oriented design:** Emphasis on maintainability, scalability, and robustness
+- **Complete system implementation:** From power-on to operational data acquisition and communication
+- **Professional code quality:** Modular structure, comprehensive error handling, clear documentation
+- **Real-world applicability:** Demonstrates skills directly transferable to commercial embedded products

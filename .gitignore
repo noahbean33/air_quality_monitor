@@ -10,6 +10,7 @@ Build/
 *.map
 *.hex
 *.bin
+*.zip
 
 # IDE specific files
 *.swp
