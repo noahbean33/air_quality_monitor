@@ -1,0 +1,54 @@
+@startuml
+skinparam participant {
+    BackgroundColor LightGreen
+    BorderColor DarkGreen
+}
+skinparam sequence {
+    ArrowColor DarkGreen
+    LifeLineBorderColor DarkGreen
+    LifeLineBackgroundColor LightGreen
+}
+
+participant "I2C Master Transmit" as Master
+participant "I2C Peripheral" as I2C
+participant "SB Interrupt" as SB
+participant "ADDR Interrupt" as ADDR
+participant "TXE Interrupt" as TXE
+participant "BTF Interrupt" as BTF
+
+== Initiate Transmission (i2c_start_transmit) ==
+Master -> I2C: Send Start Condition (i2c_send_start)
+' Master: Set SB Synch Flag
+Master -> I2C: Enable Event Interrupts (SB)
+Master -> I2C: Wait for Semaphore (SB)
+
+SB -> Master: Semaphore Given (SB Flag Set)
+
+Master -> I2C: Send Slave Address (i2c_send_slave_address)
+' Master: Set ADDR Synch Flag
+Master -> I2C: Enable Event Interrupts (ADDR)
+Master -> I2C: Wait for Semaphore (ADDR)
+
+ADDR -> Master: Semaphore Given (ADDR Flag Set)
+
+== Data Transmission ==
+' Master: Set TXE Synch Flag
+Master -> I2C: Enable TXE/BTF Interrupts
+Master -> I2C: Wait for Semaphore (TXE)
+
+TXE -> Master: Semaphore Given (TXE Flag Set)
+Master -> I2C: Send Byte
+Master -> I2C: Wait for Semaphore (BTF)
+
+BTF -> Master: Semaphore Given (BTF Flag Set)
+
+alt More Data to Send
+    Master -> I2C: Send Next Byte
+    Master -> I2C: Wait for Semaphore (TXE/BTF)
+end
+
+alt No More Data
+    Master -> I2C: Send STOP Condition
+end
+
+@enduml

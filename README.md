@@ -1,6 +1,6 @@
 # Air Quality Monitor - STM32 RTOS Project
 
-A production-quality embedded system for indoor air quality monitoring, built on the STM32F446RE microcontroller with FreeRTOS and Modbus RTU communication.
+An embedded system for indoor air quality monitoring, built on the STM32F446RE microcontroller with FreeRTOS and Modbus RTU communication.
 
 ## Project Overview
 

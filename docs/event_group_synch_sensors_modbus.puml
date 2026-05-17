@@ -1,0 +1,28 @@
+@startuml
+title Event Group Synchronization: Modbus & Sensors Task
+
+skinparam backgroundColor #f9f9f9
+skinparam sequence {
+    ArrowColor #3366cc
+    LifeLineBorderColor #3366cc
+    LifeLineBackgroundColor #ddeeff
+    ParticipantBorderColor #003366
+    ParticipantBackgroundColor #cce5ff
+    ParticipantFontColor #003366
+    ActorBorderColor #3366cc
+    ActorBackgroundColor #99bbff
+    ActorFontColor #003366
+}
+
+participant "Modbus Task" as Modbus #99bbff
+participant "Event Group" as EventGroup #ffcc99
+participant "Sensors Task" as Sensors #99ff99
+
+Modbus -> EventGroup : Set MODBUS_INITIALIZED_BIT
+Sensors -> EventGroup : Wait for MODBUS_INITIALIZED_BIT
+EventGroup -> Sensors : MODBUS_INITIALIZED_BIT Set
+Sensors -> Sensors : Read Modbus Registers
+Sensors -> Sensors : Update xFrequency
+Sensors -> Sensors : Proceed with Initialization
+
+@enduml

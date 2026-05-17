@@ -1,0 +1,13 @@
+https://www.st.com/en/evaluation-tools/nucleo-f446re.html
+
+https://www.st.com/en/microcontrollers-microprocessors/stm32f446.html
+
+https://freertos.org/
+
+https://www.st.com/en/development-tools/stm32cubeide.html
+
+https://github.com/Sensirion/embedded-sgp/releases/tag/7.1.2
+
+https://github.com/Sensirion/embedded-sht/releases
+
+https://simplymodbus.ca/v1/RTUmaster.htm

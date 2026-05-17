@@ -1,0 +1,52 @@
+@startuml
+
+skinparam backgroundColor #EEF2F7
+skinparam classAttributeIconSize 0
+skinparam defaultFontName Courier
+skinparam class {
+    BackgroundColor White
+    ArrowColor #5544AA
+    BorderColor #5544AA
+}
+
+class sensors_task {
+  - QueueHandle_t sensors_task_queue_handle
+  - BaseType_t sensors_task_has_message(void)
+  - void sensors_task(*param)
+  + error_t sensors_task_send_msg(msg_id, sampling_interval)
+  + void sensors_task_start(void)
+}
+
+class sensirion_driver {
+  + error_t sensirion_measure_voc_index_with_rh_t(*voc_index, *relative_humidity, *temperature)
+}
+
+class i2c {
+  + error_t i2c_master_transmit(*i2c_instance, device_address, *tx_buffer, data_length)
+  + error_t i2c_master_receive(*i2c_instance, device_address, *rx_buffer, data_length)
+}
+
+class tim {
+  + void tim3_delay_microseconds(microseconds)
+}
+
+class error_handler_task {
+  + void error_handler_send_msg_from_isr(event_id)
+}
+
+class sys_health_monitor {
+  + bool g_sensors_task_ok
+}
+
+class modbus_data_mgr {
+  + error_t modbus_data_mgr_send_msg(msg_type, *data, address, quantity)
+}
+
+sensors_task -down-> sensirion_driver : uses
+sensirion_driver -down-> i2c : uses
+sensirion_driver -down-> tim : uses
+sensors_task -down-> sys_health_monitor : uses
+sensors_task -down-> error_handler_task : uses
+sensors_task -down-> modbus_data_mgr : uses
+
+@enduml

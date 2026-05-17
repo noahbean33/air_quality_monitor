@@ -1,0 +1,47 @@
+@startuml
+
+skinparam backgroundColor #EEF2F7
+skinparam classAttributeIconSize 0
+skinparam defaultFontName Courier
+skinparam class {
+    BackgroundColor White
+    ArrowColor #5544AA
+    BorderColor #5544AA
+}
+
+class sys_health_monitor_task {
+  + volatile bool g_sensors_task_ok
+  - volatile bool mcu_temp_ok
+  - uint8_t ADC1_CONVERSION_COMPLETE
+  - uint16_t adc_temp_val
+  - uint16_t temperature_to_adc(temp_celsius)
+  - float sys_health_get_temperature(adc_val)
+  - void sys_health_monitor_task(*param)
+  + void sys_health_monitor_task_start(void)
+  - void ADC_IRQHandler(void)
+}
+
+class tim {
+  + void tim2_init(void)
+}
+
+class adc {
+  + void adc_init(void)
+  + void adc_awd_init(*ADCx, channel, high_thr, low_thr)
+}
+
+class iwdg {
+  + void iwdg_init(void)
+  + void iwdg_reset(void)
+}
+
+class error_handler_task {
+  + void error_handler_send_msg_from_isr(event_id)
+}
+
+sys_health_monitor_task -down-> tim : uses
+sys_health_monitor_task -down-> adc : uses
+sys_health_monitor_task -down-> iwdg : uses
+sys_health_monitor_task -down-> error_handler_task : uses
+
+@enduml

@@ -1,0 +1,32 @@
+@startuml
+skinparam participant {
+    BackgroundColor LightBlue
+    BorderColor Blue
+}
+skinparam sequence {
+    ArrowColor DarkBlue
+    LifeLineBorderColor Blue
+    LifeLineBackgroundColor LightBlue
+}
+
+participant "Startup Task" as ST
+participant "Semaphore" as S
+participant "Button Handler" as BH
+participant "EXTI ISR" as ISR
+
+ST -> ST: button_init()
+ST -> BH: button_check_and_acknowledge_iwdg_event()
+
+group Button Check and Acknowledge
+    alt if rcc_iwdg_flag_active()
+        BH -> BH: button_wait_for_acknowledge(BLINK_INTERVAL)
+    else no reset
+        BH -> BH: continue
+    end
+end
+
+group Button Press Interrupt
+    ISR -> S: xSemaphoreGiveFromISR(exti15_10_semaphore_handle)
+end
+
+@enduml

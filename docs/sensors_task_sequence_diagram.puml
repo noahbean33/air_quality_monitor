@@ -1,0 +1,56 @@
+@startuml
+skinparam participant {
+    BackgroundColor LightGreen
+    BorderColor DarkGreen
+}
+skinparam sequence {
+    ArrowColor DarkGreen
+    LifeLineBorderColor DarkGreen
+    LifeLineBackgroundColor LightGreen
+}
+
+participant "Sensors Task" as ST
+participant "Sensors Queue" as SQ
+participant "Modbus Data Manager" as MDM
+participant "Sensirion Driver" as SENS
+participant "Error Handler Task" as EHT
+
+ST -> ST: sensors_task_start()
+
+group Task Initialization
+    ST -> SENS: sensirion_init_sensors()
+    alt if ERR_OK
+        ST -> ST: Initialization Success
+    else if error
+        ST -> EHT: error_handler_send_msg(EVT_SENSOR_READ)
+    end
+end
+
+group Sampling Loop
+    loop every xFrequency
+        ST -> ST: vTaskDelayUntil(&xLastWakeTime, xFrequency)
+
+        group Check Queue for Messages
+            alt if sensors_task_has_message()
+                ST -> SQ: xQueueReceive(sensors_task_queue_handle)
+                alt if SAMPLING_INTERVAL_UPDATE
+                    ST -> ST: Update xFrequency
+                end
+            else no message
+                ST -> ST: Continue sampling
+            end
+        end
+
+        ST -> SENS: sensirion_measure_voc_index_with_rh_t()
+
+        alt if ERR_OK
+            alt if voc_index_sens != 0
+                ST -> ST: Update sensor_task_data
+                ST -> MDM: modbus_data_mgr_send_msg(INPUT_REGS_UPDATE, &sensor_task_data)
+            end
+        else if error
+            ST -> EHT: error_handler_send_msg(EVT_SENSOR_READ)
+        end
+    end
+end
+@enduml

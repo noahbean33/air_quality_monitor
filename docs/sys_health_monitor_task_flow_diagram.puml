@@ -1,0 +1,42 @@
+@startuml
+title System Health Monitor Task Flowchart
+
+skinparam backgroundColor #EEEBDC
+
+' Define colors for activities and decisions
+skinparam activity {
+    BackgroundColor #lightblue
+    BorderColor Black
+}
+skinparam note {
+    BackgroundColor #yellow
+    BorderColor Black
+}
+
+start
+:Initialize ADC and TIM2;
+:Convert temperature thresholds to ADC values;
+:Initialize Analog Watchdog with thresholds;
+:Initialize IWDG if debugger not connected;
+
+repeat :Wait for the next cycle;
+    :vTaskDelayUntil(xLastWakeTime, xFrequency);
+
+if (ADC1_CONVERSION_COMPLETE?) then (yes)
+    :Convert ADC value to temperature;
+    :Set ADC1_CONVERSION_COMPLETE to 0;
+endif
+note right: Optional step for demonstration
+
+:Check if all critical tasks are running correctly;
+if (system_healthy?) then (yes)
+    :Reset the watchdog (iwdg_reset);
+    :Clear flags for the next cycle (g_sensor_task_ok = false);
+else (no)
+    :Handle system health issue;
+endif
+
+repeat while (true)
+
+stop
+@enduml
