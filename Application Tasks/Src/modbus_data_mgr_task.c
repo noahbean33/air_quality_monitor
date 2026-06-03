@@ -1,7 +1,33 @@
-/*
- * modbus_data_mgr_task.c
+/**
+ * @file modbus_data_mgr_task.c
  *
- * Contains the Modbus Data Manager task implementation.
+ * @brief Modbus Data Manager Task implementation for the Air Quality Monitor system.
+ *
+ * Implements the FreeRTOS task that is the sole writer to Modbus register data.
+ * Incoming messages (from the Modbus Slave task or the Sensors task) are
+ * dequeued, the Modbus mutex is acquired, and the appropriate handler is called:
+ *
+ *   - Coil commands    -> process_modified_coils()
+ *   - Holding reg writes -> process_modified_holding_registers()
+ *   - Input reg updates  -> process_input_registers_update()
+ *
+ * @details
+ * Alarm evaluation flow (input register updates):
+ *   1. Each sensor value is written to the Modbus input register array.
+ *   2. The value is compared against configurable thresholds stored in holding
+ *      registers (e.g., HOLDING_ALARM_MAX_VOC_INDEX).
+ *   3. If a threshold is breached, the corresponding discrete input alarm bit
+ *      is set, the FRAM-backed alarm counter is incremented, and NVS is updated.
+ *   4. When the value returns to the normal range the alarm bit is cleared.
+ *
+ * Holding register writes are persisted to FRAM after all registers in the
+ * batch have been processed.
+ *
+ * Feedback messages are sent back through modbus_feedback_queue_handle when
+ * the originating Modbus Slave task needs to know the result before replying
+ * to the master.
+ *
+ * @see modbus_data_mgr_task.h for the public API, message types, and structures.
  */
 
 #include "modbus_data_mgr_task.h"

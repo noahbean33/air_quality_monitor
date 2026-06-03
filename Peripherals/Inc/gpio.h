@@ -1,9 +1,28 @@
-/*
- * gpio.h
+/**
+ * @file gpio.h
  *
- * Provides macro definitions, data type enumerations, and function prototypes related to
- * General-Purpose Input/Output (GPIO) operations.
+ * @brief General-Purpose Input/Output (GPIO) driver interface.
  *
+ * Defines enumerations for pin numbers, modes, alternate functions, speeds,
+ * output types, and pull resistor settings—plus macros and functions for
+ * reading, writing, and toggling individual GPIO pins.
+ *
+ * @details
+ * gpio_init() is called once at startup from main() and configures every pin
+ * used in the system:
+ *   - USER LED (PA5)   : Output push-pull.
+ *   - USER Button (PC13): Input with pull-up.
+ *   - Test pin (PC7)   : Output push-pull, fast speed.
+ *   - Sensirion I2C (PB8/PB9) : AF4, open-drain.
+ *   - Modbus UART (PA2/PA3)   : AF7, push-pull.
+ *   - FRAM SPI (PB3/PB4/PB5, CS PA10) : AF5, push-pull, high speed.
+ *
+ * The atomic macros GPIO_SET_PIN / GPIO_RESET_PIN / GPIO_READ_PIN operate
+ * directly on the BSRR/IDR registers and are safe to use from ISR context.
+ *
+ * @dependencies
+ *   - mcu.h       : CMSIS GPIO_TypeDef and port base addresses.
+ *   - gpio_defs.h : Board-level port/pin definitions for each peripheral.
  */
 
 #ifndef INC_GPIO_H_

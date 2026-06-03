@@ -1,7 +1,29 @@
-/*
- * adc.h
+/**
+ * @file adc.h
  *
- * Provides macro definitions and function prototypes related to ADC initialization.
+ * @brief ADC peripheral driver interface for the Air Quality Monitor.
+ *
+ * Provides the initialization routines for the STM32F4 ADC1 peripheral used to
+ * read the internal temperature sensor (channel 18). The ADC is configured for
+ * hardware-triggered conversions from TIM2 (rising edge) so that temperature
+ * readings occur at a fixed 1 Hz rate without CPU intervention.
+ *
+ * @details
+ * Features:
+ *   - adc_init()     : Enables the ADC1 clock, sets the prescaler to ~11.25 MHz,
+ *                      turns on the internal temperature sensor reference, and
+ *                      calls the static adc1_config() to configure conversion
+ *                      parameters and interrupts.
+ *   - adc_awd_init() : Configures the Analog Watchdog on a single regular channel
+ *                      with user-defined high/low thresholds. An AWD interrupt is
+ *                      generated if the converted value falls outside this window.
+ *
+ * The end-of-conversion (EOC) and analog-watchdog (AWD) interrupts are handled
+ * in sys_health_monitor_task.c (ADC_IRQHandler).
+ *
+ * @dependencies
+ *   - mcu.h           : CMSIS device definitions (ADC_TypeDef, etc.).
+ *   - rcc_clock_defs.h (in .c) : Clock enable macros for ADC1.
  */
 
 #ifndef INC_ADC_H_

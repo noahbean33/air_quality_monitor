@@ -1,7 +1,20 @@
-/*
- * exti.c
+/**
+ * @file exti.c
  *
- * Implements function definitions for configuring and managing External Interrupts and Events (EXTI).
+ * @brief External Interrupt / Event (EXTI) configuration implementation.
+ *
+ * Implements the SYSCFG EXTICR routing, trigger-edge selection, and
+ * EXTI line enable/disable functions declared in exti.h.
+ *
+ * @details
+ * - exti_set_source() uses the pin number to index into SYSCFG->EXTICR[0..3]
+ *   and writes the port value into the correct 4-bit nibble.
+ * - exti_set_trigger_edge() sets or clears bits in EXTI->RTSR and EXTI->FTSR
+ *   to select rising, falling, or both edges.
+ * - exti_enable_irq() / exti_disable_irq() toggle the interrupt mask in
+ *   EXTI->IMR and call the corresponding NVIC enable/disable.
+ *
+ * @see exti.h for the public API, port/pin/trigger enumerations.
  */
 
 #include "exti.h"

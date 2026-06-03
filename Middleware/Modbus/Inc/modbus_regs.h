@@ -1,8 +1,27 @@
-/*
- * modbus_regs.h
+/**
+ * @file modbus_regs.h
  *
- * Contains modbus register definitions, i.e., Coils, Discrete Inputs, Input & Holding Registers,
- * and declares their respective data structures.
+ * @brief Modbus register map definitions for the Air Quality Monitor.
+ *
+ * Enumerates every register address used in the four Modbus data models
+ * (coils, discrete inputs, input registers, holding registers) and declares
+ * the external arrays that back them. This file is the authoritative
+ * definition of the device's Modbus register map.
+ *
+ * @details
+ * Register groups:
+ *   - Coils (coil_index_e)              : Feature-enable bits (R/W by master).
+ *   - Discrete Inputs (discrete_inputs_index_e) : Alarm status bits (read-only).
+ *   - Input Registers (input_registers_index_e) : Live sensor values and alarm
+ *     counters (read-only by master, written internally).
+ *   - Holding Registers (holding_registers_index_e) : Configuration values such
+ *     as sampling interval and alarm thresholds (R/W by master).
+ *
+ * The *_MAX enumerator in each enum doubles as the array size and is used for
+ * bounds checking in the data-access layer (modbus_data.h).
+ *
+ * @dependencies
+ *   - <stdint.h> : Fixed-width integer types.
  */
 
 #ifndef MODBUS_INC_MODBUS_REGS_H_

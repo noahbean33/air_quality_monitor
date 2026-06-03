@@ -1,7 +1,18 @@
-/*
- * error.h
+/**
+ * @file error.h
  *
- * Contains the type definition for error_t.
+ * @brief Centralized error type and error code definitions for the Air Quality Monitor.
+ *
+ * Every module in the project returns an `error_t` value to indicate success
+ * or the specific failure that occurred. This header is the single point of
+ * definition for all such codes, grouped by subsystem:
+ *
+ *   - General  : ERR_OK, ERR_FAIL, ERR_TIMEOUT, ERR_INVALID_PARAM
+ *   - Sensirion: Probe failures for SHT sensor and SGP40 VOC sensor.
+ *   - Modbus   : Invalid register/coil addresses, counts, values, and mutex errors.
+ *
+ * @note When adding a new peripheral or subsystem, append its error codes
+ *       to the error_e enumeration so that existing numeric values remain stable.
  */
 
 #ifndef INC_ERROR_H_

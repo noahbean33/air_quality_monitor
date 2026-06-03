@@ -1,7 +1,29 @@
-/*
- * irq.h
+/**
+ * @file irq.h
  *
- * Contains IRQ priority definitions and initialization function prototype.
+ * @brief NVIC interrupt priority definitions and initialization.
+ *
+ * Centralizes the numeric priority levels assigned to every peripheral
+ * interrupt in the system. All priorities are expressed relative to
+ * configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY so that they remain
+ * compatible with FreeRTOS ISR-safe API calls.
+ *
+ * @details
+ * Priority assignments (lower offset = higher urgency):
+ *   - ADC (+0)          : Temperature sensor analog watchdog (critical).
+ *   - EXTI15_10 (+0)    : USER button press.
+ *   - I2C1_EV (+1)      : Sensirion sensor I2C bus events.
+ *   - TIM5 (+2)         : Microsecond delay for Sensirion communication.
+ *   - SPI1 (+3)         : FRAM SPI transfer completion.
+ *   - USART2 (+4)       : Modbus RTU frame reception.
+ *   - DMA2 Stream2/3 (+4): FRAM SPI DMA transfer complete.
+ *
+ * irq_set_priorities() must be called once during startup (from main())
+ * before any peripheral interrupt is enabled.
+ *
+ * @dependencies
+ *   - mcu.h            : CMSIS IRQn_Type definitions.
+ *   - FreeRTOSConfig.h : configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY.
  */
 
 #ifndef INC_IRQ_H_

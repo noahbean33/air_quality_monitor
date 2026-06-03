@@ -1,7 +1,30 @@
-/*
- * iwdg.h
+/**
+ * @file iwdg.h
  *
- * Contains function prototypes for the Independent Watchdog (IWDG) implementation.
+ * @brief Independent Watchdog (IWDG) driver interface.
+ *
+ * Provides initialization and control functions for the STM32F4 IWDG. The
+ * IWDG is clocked from the 32 kHz LSI oscillator and operates independently
+ * of the main system clock, ensuring a system reset even if the CPU or the
+ * main oscillator fails.
+ *
+ * @details
+ * Configuration:
+ *   - Prescaler: /128  (32 kHz / 128 = 250 Hz tick).
+ *   - Reload value: calculated for a ~4 s timeout (IWDG_TIMEOUT).
+ *   - iwdg_init() enables the LSI, unlocks the IWDG registers, sets the
+ *     prescaler and reload, then starts the watchdog.
+ *
+ * Inline helpers:
+ *   - iwdg_enable()             : Starts the watchdog (write 0xCCCC to KR).
+ *   - iwdg_enable_write_access(): Unlocks PR/RLR registers (write 0x5555).
+ *   - iwdg_reset()              : Kicks the watchdog (write 0xAAAA to KR).
+ *
+ * The System Health Monitor task calls iwdg_reset() each cycle only when all
+ * monitored tasks are healthy.
+ *
+ * @dependencies
+ *   - mcu.h : CMSIS IWDG register definitions.
  */
 
 #ifndef INC_IWDG_H_

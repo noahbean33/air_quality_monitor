@@ -1,7 +1,31 @@
-/*
- * modbus_slave_task.c
+/**
+ * @file modbus_slave_task.c
  *
- * Contains the Modbus Slave application task implementation.
+ * @brief Modbus RTU Slave Task implementation for the Air Quality Monitor system.
+ *
+ * Implements the FreeRTOS task that acts as a Modbus RTU slave on USART2.
+ *
+ * @details
+ * Startup sequence:
+ *   1. UART2 is initialized for Modbus communication.
+ *   2. Holding and input registers are loaded from FRAM (or defaults on first boot).
+ *   3. The RXNE interrupt is enabled so bytes start flowing into the RX buffer.
+ *   4. MODBUS_INITIALIZED_BIT is set in the system event group, unblocking the
+ *      Sensors task.
+ *
+ * Runtime loop:
+ *   1. The task blocks on ulTaskNotifyTake() until the UART ISR signals that an
+ *      IDLE line was detected (i.e., a complete Modbus RTU frame is in the buffer).
+ *   2. CRC-16 and minimum-length checks are performed on the received frame.
+ *   3. If the slave address matches, the Modbus mutex is acquired and the
+ *      function code is dispatched to the appropriate modbus_slave_* handler.
+ *   4. For read operations the response is sent directly.
+ *   5. For write operations, handle_modbus_status_and_send_data_update() unlocks
+ *      the mutex, forwards the change to the Data Manager task, waits for
+ *      feedback, and then sends the response (or an exception on failure).
+ *   6. The RX buffer is reset and RXNE is re-enabled for the next frame.
+ *
+ * @see modbus_slave_task.h for the public API and function code enumeration.
  */
 
 #include "modbus_slave_task.h"

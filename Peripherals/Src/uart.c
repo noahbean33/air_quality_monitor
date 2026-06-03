@@ -1,8 +1,35 @@
-/*
- * uart.c
+/**
+ * @file uart.c
  *
- * Provides UART initialization and transmitting data using interrupt and semaphore synchronization.
- * Includes support for receiving Modbus-specific frames with synchronization using task notifications.
+ * @brief UART peripheral driver implementation (interrupt + semaphore based).
+ *
+ * Implements USART2 initialization and the interrupt-driven byte-array
+ * transmit function, plus the USART2 ISR that handles both transmit
+ * synchronization and Modbus frame reception.
+ *
+ * @details
+ * Initialization (uart_init, case uart2):
+ *   - Creates binary semaphores for TX synchronization.
+ *   - Enables USART2 clock, configures 115200 baud, 8-bit word, even parity,
+ *     one stop bit.
+ *   - Enables transmitter, receiver, and USART peripheral.
+ *   - Enables USART2 NVIC interrupt.
+ *
+ * Transmit (uart_transmit_bytes):
+ *   - Writes the first byte to DR, enables TXE interrupt, blocks on semaphore.
+ *   - ISR loads subsequent bytes on each TXE; after the last byte it enables
+ *     the TC interrupt to confirm the final byte has fully shifted out.
+ *   - Returns ERR_OK on success, ERR_TIMEOUT on semaphore timeout.
+ *
+ * Receive (USART2_IRQHandler, Modbus-specific):
+ *   - RXNE: stores each byte into the Modbus RX buffer and increments the
+ *     byte counter.
+ *   - IDLE: clears the flag and sends a task notification to the Modbus Slave
+ *     task, signalling a complete frame.
+ *   - TXE/TC: gives the TX semaphore to unblock uart_transmit_bytes().
+ *   - Error flags (ORE, NE, FE, PE): cleared and reported to the Error Handler.
+ *
+ * @see uart.h for the public API, inline helpers, and flag macros.
  */
 
 #include "uart.h"

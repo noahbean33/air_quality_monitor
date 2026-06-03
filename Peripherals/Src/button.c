@@ -1,7 +1,21 @@
-/*
- * button.c
+/**
+ * @file button.c
  *
- * Implementation for initializing and managing the Nucleo Board USER button for IWDG acknowledgement.
+ * @brief USER button driver implementation for IWDG reset acknowledgement.
+ *
+ * Implements the binary-semaphore-based button press detection and the blocking
+ * acknowledgement routine that blinks the LED until the operator presses the
+ * USER button (PC13) after an IWDG reset event.
+ *
+ * @details
+ * - A static binary semaphore (exti15_10_semaphore_handle) bridges the
+ *   EXTI15_10 ISR and the button_wait_for_acknowledge() blocking loop.
+ * - EXTI15_10_IRQHandler clears the pending bit on line 13 and gives the
+ *   semaphore, waking the waiting task.
+ * - After acknowledgement the EXTI line is disabled to avoid spurious
+ *   interrupts during normal operation.
+ *
+ * @see button.h for the public API.
  */
 
 #include "button.h"

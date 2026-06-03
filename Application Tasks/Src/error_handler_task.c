@@ -1,7 +1,27 @@
-/*
- * error_handler_task.c
+/**
+ * @file error_handler_task.c
  *
- * Contains the function definitions and task logic for the error handler.
+ * @brief Error Handler Task implementation for the Air Quality Monitor system.
+ *
+ * Implements the centralized error handling FreeRTOS task. The task blocks on a
+ * message queue waiting for error event IDs posted by any other task or ISR.
+ * On receipt of an error it increments a per-event diagnostic counter and
+ * blinks the USER LED in a fixed pattern to visually signal the fault.
+ *
+ * @details
+ * Internal design:
+ *   - A static FreeRTOS queue (depth 10) carries event_id_e values.
+ *   - error_counts[] keeps a running tally per error type for debugging.
+ *   - error_handler_led_blink() performs a non-reentrant blink sequence
+ *     (EVT_BLINK_NUMBER cycles at EVT_BLINK_DELAY_MS per phase) and leaves
+ *     the LED ON afterwards to indicate an unresolved fault.
+ *   - All known error IDs currently share the same LED blink response;
+ *     the switch-case can be extended for per-error behaviour.
+ *   - ISR-safe posting is provided via error_handler_send_msg_from_isr(),
+ *     which uses xQueueSendFromISR and yields if a higher-priority task
+ *     was unblocked.
+ *
+ * @see error_handler_task.h for the public API and event_id_e definitions.
  */
 
 #include <stdbool.h>

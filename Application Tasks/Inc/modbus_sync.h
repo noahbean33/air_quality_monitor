@@ -1,8 +1,28 @@
-/*
- * modbus_sync.h
+/**
+ * @file modbus_sync.h
  *
- * Provides synchronization function prototypes for locking and unlocking access
- * to shared Modbus registers, ensuring data consistency during concurrent operations.
+ * @brief Modbus data synchronization (mutex) interface.
+ *
+ * Provides a thin abstraction over a FreeRTOS mutex semaphore that serializes
+ * access to the shared Modbus register arrays (coils, discrete inputs, holding
+ * registers, and input registers). Both the Modbus Slave task and the Modbus
+ * Data Manager task acquire this lock before reading or modifying register data,
+ * preventing data races between concurrent Modbus master requests and internal
+ * sensor-driven updates.
+ *
+ * @details
+ * API overview:
+ *   - modbus_sync_create()  – Allocates the mutex; must be called once at startup.
+ *   - modbus_sync_lock()    – Acquires the mutex with a configurable timeout.
+ *   - modbus_sync_unlock()  – Releases the mutex.
+ *
+ * All functions return typed error codes so callers can detect and report
+ * mutex-related failures (e.g., timeout or uninitialized mutex) via the
+ * centralized error handler.
+ *
+ * @dependencies
+ *   - error.h    : Common error type definitions.
+ *   - FreeRTOS.h : pdMS_TO_TICKS macro and semaphore primitives (in .c).
  */
 
 #ifndef INC_MODBUS_SYNC_H_

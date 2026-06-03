@@ -1,11 +1,26 @@
-/*
- * gpio.c
+/**
+ * @file gpio.c
  *
- * Implements function definitions for initializing and managing General-Purpose Input/Output (GPIO) pins. 
- * This file provides a comprehensive set of functionalities to configure GPIO pins including setting their 
- * modes (Input, Output, Alternate Function, Analog), output types (Push-Pull, Open-Drain), speed, and pull-up/
- * pull-down settings. It also includes functions for reading, writing, and toggling pin states.
+ * @brief General-Purpose Input/Output (GPIO) driver implementation.
  *
+ * Implements all pin configuration primitives (mode, alternate function, speed,
+ * output type, pull resistor) as static helpers and exposes the public
+ * gpio_init(), gpio_write_pin(), gpio_read_pin(), and gpio_toggle_pin() API.
+ *
+ * @details
+ * gpio_pin_config() is a convenience wrapper that calls each static helper in
+ * the correct order:
+ *   1. gpio_set_pin_mode()      – MODER register.
+ *   2. gpio_set_alt_function()  – AFR[0]/AFR[1] registers (if AF mode).
+ *   3. gpio_set_pin_speed()     – OSPEEDR register (if output/AF mode).
+ *   4. gpio_set_output_type()   – OTYPER register (if output/AF mode).
+ *   5. gpio_set_pin_pull()      – PUPDR register (if not analog mode).
+ *
+ * gpio_init() enables the required GPIO port clocks and SYSCFG, then calls
+ * gpio_pin_config() for every pin used in the system (LED, button, test pin,
+ * Sensirion I2C, Modbus UART, FRAM SPI + CS).
+ *
+ * @see gpio.h for the public API, enumerations, and atomic macros.
  */
 
 #include "gpio.h"

@@ -1,7 +1,23 @@
-/*
- * dma.c
+/**
+ * @file dma.c
  *
- * Contains function definitions required for DMA initialization and operations required by the application.
+ * @brief DMA peripheral driver implementation for the Air Quality Monitor.
+ *
+ * Initializes DMA2 streams 2 (SPI1 RX) and 3 (SPI1 TX) on channel 3 for
+ * FRAM bulk data transfers. Provides a generic stream configuration helper
+ * and a timeout-based stream-disable check.
+ *
+ * @details
+ * Stream configurations:
+ *   - Stream 2 (RX): medium priority, direct-mode and transfer-error
+ *     interrupts enabled, peripheral-to-memory (default direction).
+ *   - Stream 3 (TX): high priority (ensures clock generation before RX),
+ *     memory-to-peripheral direction, same interrupt enables.
+ *
+ * dma_configure_stream() is called before every transfer by the SPI DMA
+ * routines to load fresh memory/peripheral addresses and transfer length.
+ *
+ * @see dma.h for the public API, inline helpers, and enumerations.
  */
 
 #include "dma.h"

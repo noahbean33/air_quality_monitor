@@ -1,7 +1,35 @@
-/*
- * modbus_slave_task.h
+/**
+ * @file modbus_slave_task.h
  *
- * Contains the necessary function prototypes and definitions for the Modbus Slave task.
+ * @brief Modbus RTU Slave Task interface for the Air Quality Monitor system.
+ *
+ * This module implements the Modbus RTU slave endpoint that communicates with an
+ * external Modbus master over UART (USART2). The task waits for a notification
+ * from the UART ISR (triggered on IDLE line detection) indicating a complete
+ * Modbus frame has been received, then validates the CRC and slave address,
+ * dispatches the request by function code, and sends either a normal response
+ * or an exception frame back to the master.
+ *
+ * @details
+ * Key responsibilities:
+ *   - Initializes UART2, holding registers, and input registers from FRAM on startup.
+ *   - Validates incoming frames (CRC-16, minimum length, slave address match).
+ *   - Handles all standard Modbus function codes: read/write coils, discrete inputs,
+ *     holding registers, and input registers (FC 01–06, 0F, 10).
+ *   - For write operations, delegates data-side processing to the Modbus Data Manager
+ *     task and waits on a feedback queue before sending the response.
+ *   - Protects shared register data with the Modbus synchronization mutex.
+ *   - Signals the system_event_group (MODBUS_INITIALIZED_BIT) so the Sensors task
+ *     knows it is safe to begin sampling.
+ *
+ * @dependencies
+ *   - error.h            : Common error codes.
+ *   - FreeRTOSTasks.h    : Stack size / priority definitions.
+ *   - FreeRTOS queue.h   : Feedback queue handle.
+ *   - modbus_slave.h (in .c) : Low-level Modbus frame parsing and response API.
+ *   - modbus_sync.h (in .c)  : Shared-data mutex.
+ *   - uart.h (in .c)         : UART initialization and interrupt control.
+ *   - system_events.h (in .c): Event group for startup synchronization.
  */
 
 #ifndef INC_MODBUS_SLAVE_TASK_H_

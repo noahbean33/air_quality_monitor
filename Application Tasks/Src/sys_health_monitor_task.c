@@ -1,9 +1,32 @@
-/*
- * sys_health_monitor_task.c
+/**
+ * @file sys_health_monitor_task.c
  *
- * Implements the System Health Monitor Task, responsible for:
- * 1. Monitoring the MCU's internal temperature and notifying the Error Handler if thresholds are exceeded.
- * 2. Regularly checking the status of critical tasks and resetting the watchdog timer if they are operational.
+ * @brief System Health Monitor Task implementation for the Air Quality Monitor system.
+ *
+ * Implements the supervisory FreeRTOS task that safeguards system liveness by
+ * combining MCU temperature monitoring with a software watchdog pattern.
+ *
+ * @details
+ * Startup:
+ *   - Converts ADC1_AWD_HT/LT_TEMP_CELSIUS thresholds to raw ADC counts.
+ *   - Initializes the Analog Watchdog on ADC1 channel 18 (internal temp sensor).
+ *   - Enables the Independent Watchdog (IWDG) only when a debugger is not attached.
+ *   - Starts TIM2 (ADC trigger) and the ADC peripheral.
+ *
+ * Periodic loop (1 Hz):
+ *   - Optionally reads the latest ADC temperature conversion for diagnostics.
+ *   - Evaluates the combined system health (g_sensors_task_ok AND mcu_temp_ok).
+ *   - If healthy: kicks the IWDG and resets all task health flags.
+ *   - If unhealthy: skips the IWDG kick, allowing a system reset if the
+ *     condition persists beyond the IWDG timeout.
+ *
+ * ISR (ADC_IRQHandler):
+ *   - Analog Watchdog flag: clears AWD, reports to Error Handler, sets
+ *     mcu_temp_ok = false.
+ *   - End-of-Conversion flag: stores the raw ADC value for temperature readout.
+ *   - Overrun flag: clears OVR to prevent stalls.
+ *
+ * @see sys_health_monitor_task.h for the public API, thresholds, and health flags.
  */
 
 #include "sys_health_monitor_task.h"

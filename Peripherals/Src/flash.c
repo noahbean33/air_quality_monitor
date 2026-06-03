@@ -1,7 +1,14 @@
-/*
- * flash.c
+/**
+ * @file flash.c
  *
- * Contains function definitions for configuring the MCU's internal flash memory.
+ * @brief Internal flash memory configuration implementation.
+ *
+ * Implements flash_config_wait_states(), which is called early in rcc_init()
+ * to set the correct flash access latency before the system clock is ramped
+ * up to 180 MHz. It also enables the instruction cache, data cache, and
+ * prefetch buffer for optimal execution performance.
+ *
+ * @see flash.h for the public API.
  */
 
 #include "flash.h"

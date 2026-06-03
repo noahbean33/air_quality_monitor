@@ -1,7 +1,27 @@
-/*
- * rcc_clock_defs.h
+/**
+ * @file rcc_clock_defs.h
  *
- * Contains clock enable/disable definitions.
+ * @brief Peripheral clock enable/disable macro library.
+ *
+ * Provides one-line macros to enable or disable the AHB/APB bus clocks for
+ * every peripheral available on the STM32F446. Each macro directly sets or
+ * clears the appropriate bit in the RCC enable register so that driver init
+ * functions can simply call, e.g., RCC_SPI1_CLK_ENABLE() without needing to
+ * know the exact register and bit position.
+ *
+ * @details
+ * Peripheral groups covered:
+ *   - GPIO (A–H)        : AHB1ENR
+ *   - SYSCFG            : APB2ENR
+ *   - DMA (1–2)         : AHB1ENR
+ *   - ADC (1–3)         : APB2ENR
+ *   - SPI (1–4)         : APB1ENR / APB2ENR
+ *   - I2C (1–3)         : APB1ENR
+ *   - TIM (1–14)        : APB1ENR / APB2ENR
+ *   - USART/UART (1–6)  : APB1ENR / APB2ENR
+ *
+ * @dependencies
+ *   - mcu.h : CMSIS RCC register bit definitions.
  */
 
 #ifndef INC_RCC_CLOCK_DEFS_H_

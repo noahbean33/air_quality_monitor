@@ -1,10 +1,20 @@
-/*
- * modbus_crc.h
+/**
+ * @file modbus_crc.h
  *
- * Header for CRC-16 calculation functions used in Modbus protocol communication.
- * This header declares the function for computing the CRC-16 checksum as defined
- * in the Modbus protocol standard. The CRC-16 checksum is widely used in Modbus
- * for error-checking in data transmission.
+ * @brief CRC-16/Modbus checksum calculation interface.
+ *
+ * Declares the function used to compute the CRC-16 checksum required by the
+ * Modbus RTU protocol. Every request and response frame carries a trailing
+ * 2-byte CRC that is validated on reception and appended on transmission.
+ *
+ * @details
+ * The implementation in modbus_crc.c uses a table-driven algorithm with two
+ * 256-byte lookup tables (high and low CRC bytes) for maximum throughput,
+ * conforming to the "Modbus over Serial Line Specification and Implementation
+ * Guide V1.02" by the Modbus Organization.
+ *
+ * @dependencies
+ *   - <stdint.h> : Fixed-width integer types.
  */
 
 #ifndef INC_MODBUS_CRC_H_

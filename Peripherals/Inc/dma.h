@@ -1,7 +1,27 @@
-/*
- * dma.h
+/**
+ * @file dma.h
  *
- * Provides definitions, static inline functions and function prototypes for initializing and managing DMA.
+ * @brief DMA peripheral driver interface for the Air Quality Monitor.
+ *
+ * Provides initialization, configuration, and control functions for the STM32F4
+ * DMA2 controller. In this project DMA is used exclusively for SPI1 (FRAM)
+ * bulk transfers:
+ *   - DMA2 Stream 2 : SPI1 RX (peripheral-to-memory).
+ *   - DMA2 Stream 3 : SPI1 TX (memory-to-peripheral).
+ *
+ * @details
+ * Public API:
+ *   - dma_init()                   : Enables DMA2 clock and initializes both streams.
+ *   - dma_configure_stream()       : Sets memory/peripheral addresses, transfer length,
+ *                                    and memory-increment mode before each transfer.
+ *   - dma_wait_for_stream_disabled(): Polls the EN bit with a FreeRTOS tick-based timeout.
+ *   - Inline helpers               : dma_enable_stream, dma_disable_stream,
+ *                                    dma_enable/disable_transfer_complete_interrupt.
+ *
+ * @dependencies
+ *   - error.h          : Common error return type.
+ *   - FreeRTOSTasks.h  : pdMS_TO_TICKS for timeout conversion.
+ *   - mcu.h            : CMSIS device definitions (DMA_Stream_TypeDef, etc.).
  */
 
 #ifndef INC_DMA_H_

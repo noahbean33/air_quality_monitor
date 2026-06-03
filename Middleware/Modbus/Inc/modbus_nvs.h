@@ -1,7 +1,25 @@
-/*
- * modbus_nvs.h
+/**
+ * @file modbus_nvs.h
  *
- * Contains Modbus structure members which require storage in FRAM and their respective addresses.
+ * @brief Non-Volatile Storage (NVS) structures and FRAM address map for Modbus registers.
+ *
+ * Defines the C structures whose members mirror the subset of Modbus holding
+ * and input registers that must survive a power cycle. Each structure is
+ * serialized to a fixed FRAM address at runtime whenever the corresponding
+ * register values change.
+ *
+ * @details
+ * Memory layout:
+ *   - HOLDING_REGS_FRAM_ADDR (0x0000): modbus_nvs_holding_registers_t
+ *     Stores user-configurable thresholds and the sampling interval.
+ *   - INPUT_REGS_FRAM_ADDR  (after holding): modbus_nvs_input_registers_t
+ *     Stores cumulative alarm event counters.
+ *
+ * @note When adding new persistent registers, extend the appropriate structure
+ *       and verify that FRAM address ranges do not overlap.
+ *
+ * @dependencies
+ *   - <stdint.h> : Fixed-width integer types.
  */
 
 #ifndef MODBUS_INC_MODBUS_NVS_H_

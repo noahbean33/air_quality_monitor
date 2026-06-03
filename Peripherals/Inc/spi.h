@@ -1,8 +1,30 @@
-/*
- * spi.h
+/**
+ * @file spi.h
  *
- *  Contains function prototypes and required definitions for SPI initialization, transmitting
- *  and receiving data using interrupts and DMA.
+ * @brief SPI peripheral driver interface (interrupt, semaphore, and DMA based).
+ *
+ * Provides initialization and data transfer functions for the STM32F4 SPI
+ * peripherals. Supports both interrupt-driven byte-by-byte transfers and
+ * DMA-based bulk transfers. Currently SPI1 is the only fully configured
+ * instance (used for FRAM communication).
+ *
+ * @details
+ * Transfer modes:
+ *   - Single-byte TX/RX : Uses TXE/RXNE interrupts + binary semaphore.
+ *   - Multi-byte TX/RX  : Iterates single-byte transfers in a loop.
+ *   - DMA TX/RX         : Configures DMA2 streams for bulk transfer,
+ *                          waits on a transfer-complete semaphore.
+ *
+ * SPI1 ISR (SPI1_IRQHandler, in spi.c) handles TXE, RXNE, and OVR flags.
+ * DMA2 Stream 2/3 ISRs handle transfer-complete and error flags for DMA mode.
+ *
+ * Inline helpers for SPI enable/disable, TXE/RXNE interrupt control, OVR
+ * flag clearing, and DMA enable/disable are provided.
+ *
+ * @dependencies
+ *   - error.h    : Common error return type.
+ *   - mcu.h      : CMSIS SPI_TypeDef and register bit definitions.
+ *   - FreeRTOS.h : pdMS_TO_TICKS and semaphore primitives.
  */
 
 #ifndef INC_SPI_H_

@@ -29,6 +29,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * @file sensirion_hw_i2c_implementation.c
+ *
+ * @brief Hardware abstraction layer for Sensirion sensor I2C communication.
+ *
+ * Implements the platform-specific hooks required by the Sensirion Embedded
+ * Driver Library (sensirion_i2c.h). The implementations here target the
+ * STM32F4xx with FreeRTOS and use the project's I2C1 driver and TIM5 for
+ * microsecond-precision delays.
+ *
+ * @details
+ * Implemented callbacks:
+ *   - sensirion_i2c_init()    : Initializes I2C1 via the project's I2C driver.
+ *   - sensirion_i2c_release() : Placeholder (no dynamic resources to free).
+ *   - sensirion_i2c_read()    : Delegates to i2c_master_receive() on I2C1.
+ *   - sensirion_i2c_write()   : Delegates to i2c_master_transmit() on I2C1.
+ *   - sensirion_sleep_usec()  : Uses TIM5 in One-Pulse Mode to generate the
+ *                               requested delay, synchronized via a FreeRTOS
+ *                               binary semaphore given from TIM5_IRQHandler.
+ *
+ * TIM5 interrupt flow:
+ *   1. sensirion_sleep_usec() configures TIM5 ARR and starts the counter.
+ *   2. The calling task blocks on xSemaphoreTake().
+ *   3. TIM5_IRQHandler fires on update, gives the semaphore, and wakes the task.
+ *
+ * @dependencies
+ *   - i2c.h  : Low-level I2C master driver (interrupt + semaphore based).
+ *   - tim.h  : TIM5 initialization and microsecond delay setup.
+ *   - FreeRTOS semphr.h : Binary semaphore for ISR-to-task synchronization.
+ */
+
 #include "i2c.h"
 #include "tim.h"
 #include "sensirion_arch_config.h"

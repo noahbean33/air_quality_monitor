@@ -1,9 +1,29 @@
-/*
- * rcc.h
+/**
+ * @file rcc.h
  *
- * Provides macro definitions and function prototypes for RCC (Reset and Clock Control)
- * initialization and management within the MCU. This includes oscillator configurations,
- * system clock source selection, and bus prescaler options.
+ * @brief Reset and Clock Control (RCC) driver interface.
+ *
+ * Provides the full clock-tree configuration for the STM32F446 MCU, including
+ * oscillator enable/disable, PLL configuration, system clock source selection,
+ * and AHB/APB bus prescaler settings. Also exposes runtime query functions for
+ * SYSCLK, HCLK, PCLK1, and PCLK2 frequencies, which are used by peripheral
+ * drivers (UART baud-rate, I2C timing, etc.) to derive their own clock rates.
+ *
+ * @details
+ * Target clock configuration (set by rcc_init()):
+ *   - PLL source     : HSE (8 MHz from ST-LINK oscillator).
+ *   - SYSCLK         : 180 MHz (PLL P output).
+ *   - HCLK (AHB)     : 180 MHz (prescaler /1).
+ *   - PCLK1 (APB1)   : 45 MHz  (prescaler /4).
+ *   - PCLK2 (APB2)   : 45 MHz  (prescaler /4).
+ *
+ * Inline helpers for oscillators (HSE, HSI, LSI), PLL, prescalers, clock
+ * source selection, and IWDG reset flag management are provided for direct
+ * register manipulation.
+ *
+ * @dependencies
+ *   - mcu.h   : CMSIS RCC register definitions.
+ *   - flash.h (in .c) : Flash latency configuration during clock ramp.
  */
 
 #ifndef INC_RCC_H_

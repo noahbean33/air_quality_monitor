@@ -1,8 +1,23 @@
-/*
- * gpio_defs.h
+/**
+ * @file gpio_defs.h
  *
- * Defines GPIO ports and pins for all hardware components used in the system.
+ * @brief Board-level GPIO port and pin assignments for every hardware interface.
  *
+ * Maps logical peripheral names (USER_LED, MODBUS_TX, FRAM_SCK, etc.) to their
+ * physical STM32 GPIO port and pin. Centralizing these definitions here makes
+ * it easy to adjust the PCB layout or pin assignments in a single place.
+ *
+ * @details
+ * Peripheral groups defined:
+ *   - User interface   : LED (PA5), button (PC13).
+ *   - Test interface   : Debug/test output (PC7).
+ *   - Sensirion I2C    : SCL (PB8), SDA (PB9).
+ *   - Modbus UART      : TX (PA2), RX (PA3).
+ *   - FRAM SPI         : SCK (PB3), MISO (PB4), MOSI (PB5), CS (PA10).
+ *
+ * @dependencies
+ *   - mcu.h  : CMSIS GPIO port base addresses (GPIOA, GPIOB, etc.).
+ *   - gpio.h : GPIO_PIN_* enumeration values.
  */
 
 #ifndef INC_GPIO_DEFS_H_

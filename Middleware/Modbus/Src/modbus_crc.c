@@ -1,13 +1,24 @@
-/*
- * modbus_crc.c
+/**
+ * @file modbus_crc.c
  *
- * Implements CRC-16 calculation for Modbus protocol as per the Modbus specification.
- * This file contains lookup tables and calculation logic for the Modbus-specific CRC-16
- * (CRC-16/Modbus). The CRC tables and algorithm are standard in Modbus communication
- * for error checking in data transmission.
+ * @brief CRC-16/Modbus checksum calculation implementation.
+ *
+ * Contains the two 256-byte lookup tables (high-order and low-order CRC bytes)
+ * and the modbus_crc16() function that computes the CRC-16 checksum for a
+ * given byte buffer. The algorithm processes one byte per iteration using the
+ * standard table-driven approach defined in the Modbus specification.
+ *
+ * @details
+ * Algorithm outline (per byte):
+ *   1. XOR the current low CRC byte with the next data byte to form an index.
+ *   2. Replace the low CRC byte with the high CRC byte XORed with table_crc_hi[index].
+ *   3. Replace the high CRC byte with table_crc_lo[index].
+ *   4. The final 16-bit CRC is returned as (crc_hi << 8 | crc_lo).
  *
  * Reference: "Modbus over Serial Line Specification and Implementation Guide V1.02"
  * by the Modbus Organization.
+ *
+ * @see modbus_crc.h for the public function declaration.
  */
 
 #include "modbus_crc.h"

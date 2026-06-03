@@ -1,8 +1,14 @@
-/*
- * irq.c
+/**
+ * @file irq.c
  *
- * Configures IRQ priority levels for the system by setting priority levels in
- * the NVIC (Nested Vectored Interrupt Controller) for specific interrupts.
+ * @brief NVIC interrupt priority initialization implementation.
+ *
+ * Implements irq_set_priorities(), which programs the NVIC priority register
+ * for every peripheral interrupt used in the system, using the constants
+ * defined in irq.h. Called once from main() before the FreeRTOS scheduler
+ * starts.
+ *
+ * @see irq.h for the priority definitions and rationale.
  */
 
 #include "irq.h"

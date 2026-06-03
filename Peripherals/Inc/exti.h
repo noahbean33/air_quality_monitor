@@ -1,7 +1,24 @@
-/*
- * exti.h
+/**
+ * @file exti.h
  *
- * Provides enumerations and function prototypes for configuring and managing EXTI.
+ * @brief External Interrupt / Event (EXTI) configuration interface.
+ *
+ * Provides helper functions for routing GPIO pins to EXTI lines, selecting
+ * trigger edges, and enabling/disabling individual EXTI interrupts via the
+ * NVIC. Used in this project primarily for the USER button (EXTI line 13).
+ *
+ * @details
+ * Functions:
+ *   - exti_set_source()       : Writes the SYSCFG EXTICR registers to map a
+ *                               GPIO port to an EXTI line (0-15).
+ *   - exti_set_trigger_edge() : Configures rising, falling, or both edges in
+ *                               the EXTI RTSR/FTSR registers.
+ *   - exti_enable_irq()       : Unmasks the line in EXTI_IMR and calls
+ *                               NVIC_EnableIRQ.
+ *   - exti_disable_irq()      : Masks the line and calls NVIC_DisableIRQ.
+ *
+ * @dependencies
+ *   - gpio.h (includes mcu.h) : GPIO pin enumeration and CMSIS types.
  */
 
 #ifndef INC_EXTI_H_

@@ -1,7 +1,20 @@
-/*
- * flash.h
+/**
+ * @file flash.h
  *
- * Provides function prototypes for configuring the internal flash memory of the MCU.
+ * @brief Internal flash memory configuration interface.
+ *
+ * Provides the function to configure the flash access latency (wait states)
+ * and caching features based on the target HCLK frequency. This must be
+ * called during clock tree initialization (rcc_init) before switching to
+ * higher system clock speeds.
+ *
+ * @details
+ * flash_config_wait_states() enables the instruction cache, data cache, and
+ * prefetch buffer, then calculates the required number of wait states from
+ * the HCLK frequency (latency = (hclk - 1) / 30 for 2.7-3.6 V operation).
+ *
+ * @dependencies
+ *   - mcu.h : CMSIS device definitions (FLASH register access).
  */
 
 #ifndef INC_FLASH_H_

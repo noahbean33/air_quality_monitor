@@ -1,7 +1,27 @@
-/*
- * modbus_data.c
+/**
+ * @file modbus_data.c
  *
- * Implementation for Modbus data storage and access functions.
+ * @brief Modbus register data access layer and NVS persistence implementation.
+ *
+ * Implements the getter/setter functions for all four Modbus register types
+ * and the FRAM-backed initialisation and persistence routines.
+ *
+ * @details
+ * Key implementation notes:
+ *   - Coils and discrete inputs are stored as packed bit arrays; the
+ *     getter/setter functions handle byte-index and bit-position arithmetic.
+ *   - "set_and_data" variants (modbus_data_set_holding_register_and_data,
+ *     modbus_data_set_input_register_and_data) update both the live Modbus
+ *     register array and the NVS shadow structure so that a subsequent call
+ *     to the NVS update function persists the latest value.
+ *   - modbus_data_init_holding_registers() reads the NVS structure from FRAM;
+ *     if the FRAM contains 0x0000 for the sampling interval (indicating
+ *     uninitialized memory), it writes default values to both the register
+ *     array and FRAM.
+ *   - modbus_data_init_input_registers() unconditionally loads alarm counters
+ *     from FRAM on every boot.
+ *
+ * @see modbus_data.h for the public API and default value definitions.
  */
 
 #include "fram.h"

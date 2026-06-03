@@ -1,9 +1,29 @@
-/*
- * FreeRTOSTasks.h
+/**
+ * @file FreeRTOSTasks.h
  *
- * Contains definitions of FreeRTOS tasks, prioritizing their stack sizes and
- * execution priorities. This file centralizes task configuration for ease of
- * management and clarity in the overall system design.
+ * @brief Centralized FreeRTOS task stack-size and priority definitions.
+ *
+ * All application-level FreeRTOS tasks draw their stack sizes and priority
+ * assignments from this single header. Centralizing these values ensures
+ * consistent tuning and simplifies memory budgeting for the system.
+ *
+ * @details
+ * Task priority guidelines used in this project:
+ *   - Higher numeric value = higher priority (FreeRTOS convention).
+ *   - The Error Handler runs at the highest application priority so that
+ *     fault signalling is never starved.
+ *   - Sensor acquisition runs above Modbus communication to ensure timely
+ *     environmental readings.
+ *   - The Modbus Data Manager runs at a lower priority since its work is
+ *     deferred and non-time-critical relative to sensor sampling.
+ *   - The System Health Monitor runs at idle+1 so the IWDG is only kicked
+ *     when all higher-priority work has completed.
+ *
+ * Stack sizes are expressed in words (4 bytes each on Cortex-M4) and should
+ * be validated with FreeRTOS stack high-water-mark utilities during testing.
+ *
+ * @dependencies
+ *   - FreeRTOS.h : configMINIMAL_STACK_SIZE and tskIDLE_PRIORITY macros.
  */
 
 #ifndef FREERTOSTASKS_H_

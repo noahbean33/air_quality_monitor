@@ -1,8 +1,36 @@
-/*
- * uart.h
+/**
+ * @file uart.h
  *
- * Declares function prototypes for UART initialization, interrupt-driven data transmission,
- * and Modbus frame reception, along with related definitions and static-line functions.
+ * @brief UART peripheral driver interface (interrupt + semaphore based).
+ *
+ * Provides initialization and interrupt-driven transmit functions for the
+ * STM32F4 USART/UART peripherals. Currently USART2 is the only fully
+ * configured instance (used for Modbus RTU communication at 115200 baud,
+ * 8-E-1).
+ *
+ * @details
+ * Transmit flow (uart_transmit_bytes):
+ *   1. Writes the first byte to DR and enables the TXE interrupt.
+ *   2. The ISR loads successive bytes into DR on each TXE event; the
+ *      calling task blocks on a semaphore between bytes.
+ *   3. After the last byte, the TC (Transmission Complete) interrupt is
+ *      enabled. The ISR gives the semaphore once TC fires.
+ *
+ * Receive flow (Modbus-specific, in the USART2 ISR within
+ * modbus_slave_task.c):
+ *   - RXNE  : Each incoming byte is stored into the Modbus RX buffer.
+ *   - IDLE  : Signals end-of-frame; a task notification wakes the Modbus
+ *             Slave task.
+ *   - Error flags (ORE, NE, FE, PE) are detected and reported.
+ *
+ * Inline helpers cover UART enable/disable, TX/RX control, and interrupt
+ * management for TXE, TC, RXNE, and IDLE.
+ *
+ * @dependencies
+ *   - error.h         : Common error return type.
+ *   - FreeRTOSTasks.h : pdMS_TO_TICKS for timeout conversion.
+ *   - mcu.h           : CMSIS USART_TypeDef and register bit definitions.
+ *   - rcc.h           : rcc_get_pclk1/2_freq() for baud-rate calculation.
  */
 
 #ifndef INC_UART_H_

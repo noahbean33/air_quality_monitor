@@ -1,7 +1,28 @@
-/*
- * rcc.c
+/**
+ * @file rcc.c
  *
- * Contains function definitions required for RCC initialization and validation.
+ * @brief Reset and Clock Control (RCC) driver implementation.
+ *
+ * Implements the clock-tree initialization (rcc_init) and runtime clock-frequency
+ * query functions (rcc_get_sysclk_freq, rcc_get_hclk_freq, rcc_get_pclk1_freq,
+ * rcc_get_pclk2_freq).
+ *
+ * @details
+ * rcc_init() sequence:
+ *   1. Enable the HSE oscillator and wait for ready.
+ *   2. Configure PLL: source = HSE, PLLM, PLLN, PLLP, PLLQ to reach 180 MHz.
+ *   3. Configure flash wait states for the target HCLK (via flash_config_wait_states).
+ *   4. Set AHB prescaler (/1), APB1 prescaler (/4), APB2 prescaler (/4).
+ *   5. Enable PLL and wait for lock.
+ *   6. Switch SYSCLK source to PLL-P.
+ *   7. Disable HSI to save power.
+ *   8. Update SystemCoreClock via SystemCoreClockUpdate().
+ *
+ * The rcc_get_*_freq() functions read the current RCC_CFGR/PLLCFGR registers
+ * and compute the actual frequency, accounting for prescaler tables provided
+ * by the CMSIS system_stm32f4xx module.
+ *
+ * @see rcc.h for the public API, oscillator constants, and inline helpers.
  */
 
 #include "rcc.h"

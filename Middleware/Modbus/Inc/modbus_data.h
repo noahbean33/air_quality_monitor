@@ -1,8 +1,33 @@
-/*
- * modbus_data.h
+/**
+ * @file modbus_data.h
  *
- * Header file for Modbus data storage and access functions,
- * and contains default Settings for Holding Register data.
+ * @brief Modbus register data access layer and NVS persistence interface.
+ *
+ * Provides getter/setter functions for every Modbus register type (coils,
+ * discrete inputs, input registers, holding registers) and manages the
+ * synchronisation between the in-RAM register arrays and their FRAM-backed
+ * non-volatile shadow copies.
+ *
+ * @details
+ * Register types and their roles:
+ *   - Coils            : Single-bit R/W outputs (e.g., enable/disable features).
+ *   - Discrete Inputs  : Single-bit read-only alarm flags (set by the system).
+ *   - Holding Registers: 16-bit R/W configuration (sampling interval, thresholds).
+ *   - Input Registers  : 16-bit read-only sensor data and alarm counters.
+ *
+ * Default configuration values for holding registers are defined here and are
+ * used on first boot (when FRAM is uninitialized).
+ *
+ * NVS functions:
+ *   - modbus_data_init_holding_registers() / modbus_data_init_input_registers()
+ *     load register values from FRAM at startup, falling back to defaults.
+ *   - modbus_data_update_nvs_holding_regs() / modbus_data_update_nvs_input_regs()
+ *     persist the current shadow structure to FRAM.
+ *
+ * @dependencies
+ *   - modbus_regs.h : Register index enumerations and array declarations.
+ *   - modbus_nvs.h  : NVS shadow structure definitions and FRAM addresses.
+ *   - error.h       : Common error return type.
  */
 
 #ifndef MODBUS_INC_MODBUS_DATA_H_

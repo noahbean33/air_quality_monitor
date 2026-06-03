@@ -1,5 +1,36 @@
 /**
- * Application entry point.
+ * @file main.c
+ *
+ * @brief Application entry point and startup task for the Air Quality Monitor.
+ *
+ * This file contains the main() function—the first code executed after the
+ * CMSIS SystemInit()—and the one-shot startup task that brings up every
+ * subsystem in the correct order.
+ *
+ * @details
+ * Initialization sequence in main():
+ *   1. RCC: Configures the system clock tree (PLL from HSE -> 180 MHz SYSCLK).
+ *   2. GPIO: Enables port clocks and configures all application pins.
+ *   3. IRQ: Sets NVIC priority levels for all peripherals used in the project.
+ *   4. DMA: Initialises DMA2 streams for SPI1 (FRAM) transfers.
+ *   5. Creates the startup FreeRTOS task and starts the scheduler.
+ *
+ * Startup task (vStartupTask):
+ *   1. Creates the system event group for inter-task synchronization.
+ *   2. Checks for a previous IWDG reset and waits for user acknowledgement.
+ *   3. Initializes the FRAM and runs a basic read-back validation test.
+ *   4. Creates all application tasks (Error Handler, Sensors, System Health
+ *      Monitor, Modbus Slave, Modbus Data Manager).
+ *   5. Deletes itself once all tasks are running.
+ *
+ * Also contains:
+ *   - TIM3 update ISR for FreeRTOS run-time statistics counter.
+ *   - Helper functions for configuring the run-time stats timer.
+ *
+ * @dependencies
+ *   - All peripheral drivers (rcc, gpio, irq, dma, fram, button).
+ *   - All application task start functions.
+ *   - FreeRTOS kernel (scheduler, task, event group APIs).
  */
 
 #include <string.h>

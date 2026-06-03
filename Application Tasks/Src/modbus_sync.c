@@ -1,8 +1,21 @@
-/*
- * modbus_sync.c
+/**
+ * @file modbus_sync.c
  *
- * Contains the synchronization function definitions for locking and unlocking access
- * to shared Modbus registers, ensuring data consistancy during concurrent operations.
+ * @brief Modbus data synchronization (mutex) implementation.
+ *
+ * Wraps a FreeRTOS mutex semaphore to serialize access to the shared Modbus
+ * register arrays. The mutex is created once at system startup by the Modbus
+ * Slave task (via modbus_sync_create()) and is then acquired/released by both
+ * the Modbus Slave task and the Modbus Data Manager task whenever they need to
+ * read or modify register data.
+ *
+ * @details
+ *   - modbus_sync_lock() blocks for up to MODBUS_MUTEX_TIMEOUT_TICKS.
+ *   - All three functions return distinct error codes so the caller can
+ *     report the specific failure (not created, timeout, unlock fail) to the
+ *     Error Handler task.
+ *
+ * @see modbus_sync.h for the public API and timeout configuration.
  */
 
 #include "modbus_sync.h"

@@ -1,7 +1,35 @@
-/*
- * modbus_data_mgr_task.h
+/**
+ * @file modbus_data_mgr_task.h
  *
- * Contains the necessary function prototypes and definitions for the Modbus Data Manager task.
+ * @brief Modbus Data Manager Task interface for the Air Quality Monitor system.
+ *
+ * The Modbus Data Manager is a FreeRTOS task that acts as the single point of
+ * authority for modifying Modbus register data (coils, holding registers, and
+ * input registers). All write operations—whether originating from the Modbus
+ * master (via the Modbus Slave task) or from internal sensor updates (via the
+ * Sensors task)—are serialized through this task's message queue.
+ *
+ * @details
+ * Key responsibilities:
+ *   - Receives processing messages describing which registers changed and how.
+ *   - Acquires the Modbus synchronization mutex before touching shared data.
+ *   - Delegates to per-register-type handlers (coils, holding regs, input regs).
+ *   - Evaluates alarm thresholds for sensor readings (VOC, temperature, humidity)
+ *     and updates discrete input alarm flags and FRAM-backed alarm counters.
+ *   - Persists configuration and alarm data to FRAM via modbus_data_update_nvs_*().
+ *   - Sends feedback messages back to the Modbus Slave task when the master's
+ *     write request requires a synchronous acknowledgement before responding.
+ *
+ * @dependencies
+ *   - error.h            : Common error type definitions.
+ *   - FreeRTOSTasks.h    : Task stack size and priority macros.
+ *   - modbus_data.h      : Register read/write and NVS persistence API.
+ *   - modbus_sync.h (in .c) : Mutex for shared Modbus data protection.
+ *   - sensors_task.h (in .c) : For forwarding sampling interval updates.
+ *   - error_handler_task.h (in .c) : For reporting processing failures.
+ *
+ * @note Expand the processing switch-cases when new coils or holding registers
+ *       are added to the Modbus register map.
  */
 
 #ifndef INC_MODBUS_DATA_MGR_TASK_H_

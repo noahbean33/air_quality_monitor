@@ -1,10 +1,32 @@
-/*
- * modbus_slave.c
+/**
+ * @file modbus_slave.c
  *
- * Implements Modbus RTU slave functionality, including function codes and response sending.
+ * @brief Modbus RTU slave protocol-level implementation.
  *
- * Originally inspired by the work of ControllersTech, this implementation
- * has been expanded and customized for practical use in this course.
+ * Implements the frame-level processing for all supported Modbus function codes
+ * and manages the shared register arrays (coils, discrete inputs, holding
+ * registers, input registers).
+ *
+ * @details
+ * Response flow (common to all read functions):
+ *   1. Extract start address and quantity from the received frame.
+ *   2. Validate quantity (1 .. MAX) and end address (< *_MAX).
+ *   3. Pack the requested register/coil data into the TX buffer.
+ *   4. Append the CRC-16 via modbus_slave_send_response() and transmit.
+ *
+ * Write functions additionally return output parameters (start address,
+ * quantity) so the calling task can forward them to the Data Manager for
+ * application-level processing.
+ *
+ * Exception handling:
+ *   - ILLEGAL_DATA_VALUE  for out-of-range quantity.
+ *   - ILLEGAL_DATA_ADDRESS for out-of-range start/end address.
+ *   - ILLEGAL_DATA_VALUE  for invalid coil state bytes.
+ *
+ * Originally inspired by the work of ControllersTech; expanded and customized
+ * for this project.
+ *
+ * @see modbus_slave.h for constants, buffer structures, and function prototypes.
  */
 
 #include <string.h>

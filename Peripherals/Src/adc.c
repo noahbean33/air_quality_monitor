@@ -1,8 +1,27 @@
-/*
- * adc.c
+/**
+ * @file adc.c
  *
- * Contains function definitions required for ADC initialization and configuration
- * for reading the internal temperature sensor, as well as Analog Watchdog initialization.
+ * @brief ADC peripheral driver implementation for the Air Quality Monitor.
+ *
+ * Configures ADC1 for periodic internal temperature sensor readings triggered
+ * by TIM2 and provides the Analog Watchdog (AWD) setup for threshold monitoring.
+ *
+ * @details
+ * adc1_config() (static):
+ *   - Clears CR1/CR2 to a known state.
+ *   - Enables EOC interrupt for end-of-conversion notification.
+ *   - Selects TIM2 TRGO (rising edge) as the external trigger.
+ *   - Sets EOCS so EOC fires after each single conversion.
+ *   - Configures channel 18 (temp sensor) with 112-cycle sample time
+ *     (~11 us at 11.25 MHz ADC clock).
+ *   - Enables ADC1.
+ *
+ * adc_awd_init():
+ *   - Programs the HTR/LTR threshold registers.
+ *   - Selects the monitored channel and enables single-channel AWD on
+ *     regular conversions with an interrupt.
+ *
+ * @see adc.h for the public API and channel enumeration.
  */
 
 #include "adc.h"

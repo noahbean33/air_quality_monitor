@@ -1,8 +1,34 @@
-/*
- * modbus_slave.h
+/**
+ * @file modbus_slave.h
+ *
+ * @brief Modbus RTU slave protocol-level interface.
+ *
+ * Declares constants, data structures, and function prototypes for the
+ * low-level Modbus RTU frame processing engine. This layer sits below the
+ * Modbus Slave *task* (modbus_slave_task.c) and handles:
+ *   - Parsing and validating individual Modbus function codes.
+ *   - Preparing response and exception frames.
+ *   - Directly reading/writing the shared register arrays.
+ *
+ * @details
+ * Supported function codes (see modbus_slave_task.h for the dispatch table):
+ *   FC 01 – Read Coils
+ *   FC 02 – Read Discrete Inputs
+ *   FC 03 – Read Holding Registers
+ *   FC 04 – Read Input Registers
+ *   FC 05 – Write Single Coil
+ *   FC 06 – Write Single Register
+ *   FC 0F – Write Multiple Coils
+ *   FC 10 – Write Multiple Registers
  *
  * This code is inspired by the work of ControllersTech and has been further
- * expanded and developed for practical application in this course.
+ * expanded and customized for practical application in this project.
+ *
+ * @dependencies
+ *   - modbus_crc.h  : CRC-16 calculation for frame validation and response.
+ *   - modbus_regs.h : Register index enumerations and array declarations.
+ *   - modbus_data.h : High-level register getter/setter functions.
+ *   - error.h       : Common error return type.
  */
 
 #ifndef INC_MODBUSSLAVE_H_

@@ -1,7 +1,30 @@
-/*
- * fram.c
+/**
+ * @file fram.c
  *
- * Implements interface functions for the Fujitsu MB85RS64V SPI FRAM module.
+ * @brief Driver implementation for the Fujitsu MB85RS64V 64-Kbit SPI FRAM.
+ *
+ * Provides the concrete SPI + DMA routines for communicating with the FRAM.
+ *
+ * @details
+ * Write sequence (fram_write):
+ *   1. Assert CS low.
+ *   2. Send WREN opcode (single-byte SPI transmit).
+ *   3. Deassert CS, then reassert CS.
+ *   4. Send WRITE opcode + 16-bit address (3-byte SPI transmit).
+ *   5. Transmit the data payload via DMA (spi_transmit_bytes_dma).
+ *   6. Deassert CS.
+ *   7. Reassert CS, send WRDI opcode, deassert CS.
+ *
+ * Read sequence (fram_read):
+ *   1. Assert CS low.
+ *   2. Send READ opcode + 16-bit address (3-byte SPI transmit).
+ *   3. Receive the requested data length via DMA (spi_receive_bytes_dma).
+ *   4. Deassert CS.
+ *
+ * @note All functions assume SPI1 has been previously initialized and
+ *       DMA2 streams 2/3 are configured via dma_init().
+ *
+ * @see fram.h for the public API, opcode definitions, and CS macros.
  */
 
 #include "fram.h"

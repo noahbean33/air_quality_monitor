@@ -1,7 +1,25 @@
-/*
- * tim.h
+/**
+ * @file tim.h
  *
- * Contains function prototypes for initializing various timers used in the application.
+ * @brief Timer peripheral driver interface for the Air Quality Monitor.
+ *
+ * Provides initialization and utility functions for three hardware timers,
+ * each serving a distinct purpose in the system:
+ *
+ * @details
+ * Timer assignments:
+ *   - TIM2 : Triggers ADC1 conversions for the internal temperature sensor at
+ *            1 Hz via TRGO (update event). Runs continuously after init.
+ *   - TIM3 : Generates 10 kHz update interrupts used by FreeRTOS run-time
+ *            statistics (configGENERATE_RUN_TIME_STATS). ISR in main.c.
+ *   - TIM5 : One-Pulse Mode timer providing microsecond-resolution delays
+ *            for Sensirion sensor communication. tim5_delay_microseconds()
+ *            configures and starts the timer; the update ISR (in
+ *            sensirion_hw_i2c_implementation.c) signals completion.
+ *
+ * @dependencies
+ *   - mcu.h            : CMSIS TIM register definitions.
+ *   - rcc_clock_defs.h (in .c) : Timer clock enable macros.
  */
 
 #ifndef INC_TIM_H_

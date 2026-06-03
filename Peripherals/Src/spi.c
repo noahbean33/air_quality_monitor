@@ -1,8 +1,38 @@
-/*
- * spi.c
+/**
+ * @file spi.c
  *
- *  Contains function definitions required for SPI initialization, transmitting
- *  and receiving data using interrupts and DMA with semaphore synchronization.
+ * @brief SPI peripheral driver implementation (interrupt, semaphore, and DMA based).
+ *
+ * Implements SPI1 initialization and all data transfer functions (single-byte,
+ * multi-byte, and DMA-based) declared in spi.h.
+ *
+ * @details
+ * Initialization (spi_init, case spi1):
+ *   - Creates binary semaphores for interrupt-based and DMA-based synchronization.
+ *   - Enables SPI1 clock, configures as master, CPOL=0/CPHA=0, MSB-first,
+ *     software slave management, baud-rate prescaler /2.
+ *   - Enables SPI1 and its NVIC interrupt.
+ *
+ * Interrupt transfer flow (single/multi-byte):
+ *   - TX: enables TXE interrupt, blocks on semaphore; ISR writes byte, gives
+ *     semaphore. Repeats per byte.
+ *   - RX: writes a dummy byte for clock generation, enables RXNE interrupt,
+ *     blocks on semaphore; ISR reads DR, gives semaphore.
+ *
+ * DMA transfer flow:
+ *   - Disables both DMA streams, waits for disable confirmation.
+ *   - Configures Stream 2 (RX) and Stream 3 (TX) via dma_configure_stream().
+ *   - Enables transfer-complete interrupts and DMA streams.
+ *   - Enables SPI RX/TX DMA requests.
+ *   - Blocks on the DMA semaphore (given by DMA2 Stream 2/3 ISR on TCIF).
+ *   - Cleans up: disables DMA requests, clears SPI OVR flag.
+ *
+ * ISRs:
+ *   - SPI1_IRQHandler        : Handles TXE, RXNE, and OVR.
+ *   - DMA2_Stream2_IRQHandler: Handles RX TCIF, DMEIF, TEIF.
+ *   - DMA2_Stream3_IRQHandler: Handles TX TCIF, DMEIF, TEIF.
+ *
+ * @see spi.h for the public API, inline helpers, and flag macros.
  */
 
 #include "spi.h"

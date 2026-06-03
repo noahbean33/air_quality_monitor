@@ -1,7 +1,37 @@
-/*
- * fram.h
+/**
+ * @file fram.h
  *
- * Defines macros and function prototypes for interfacing with the Fujitsu MB85RS64V SPI FRAM module.
+ * @brief Driver interface for the Fujitsu MB85RS64V 64-Kbit SPI FRAM.
+ *
+ * This module abstracts the SPI + DMA communication with the external
+ * Ferroelectric RAM (FRAM) used for non-volatile storage in the Air Quality
+ * Monitor. FRAM provides virtually unlimited write endurance (~10^13 cycles)
+ * and instant writes, making it ideal for persisting Modbus configuration
+ * (holding registers) and alarm counters (input registers) across power cycles.
+ *
+ * @details
+ * Hardware connection:
+ *   - SPI1 (master, CPOL=0/CPHA=0)
+ *   - CS pin: FRAM_CS_PORT / FRAM_CS_PIN (active-low, controlled via macros).
+ *   - DMA2 Stream 2 (RX) / Stream 3 (TX) for bulk transfers.
+ *
+ * Supported FRAM commands (opcodes):
+ *   - WREN / WRDI : Write enable / disable.
+ *   - READ / WRITE: Random-address byte read / write with 16-bit address.
+ *   - RDSR / WRSR : Read / write status register.
+ *   - RDID        : Read device ID.
+ *
+ * Public API:
+ *   - fram_init()  : Enables SPI1 and the FRAM CS pin.
+ *   - fram_write() : Writes an arbitrary-length byte buffer starting at a
+ *                    16-bit FRAM address (uses DMA for the data phase).
+ *   - fram_read()  : Reads an arbitrary-length byte buffer from a 16-bit
+ *                    FRAM address (uses DMA for the data phase).
+ *
+ * @dependencies
+ *   - spi.h / dma.h : Low-level SPI and DMA drivers.
+ *   - gpio.h        : CS pin control (via FRAM_CS_LOW / FRAM_CS_HIGH macros).
+ *   - error.h       : Common error return type.
  */
 
 #ifndef INC_FRAM_H_

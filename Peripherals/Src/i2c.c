@@ -1,8 +1,34 @@
-/*
- * i2c.c
+/**
+ * @file i2c.c
  *
- *  Contains function definitions required for I2C initialization, transmitting
- *  and receiving data using interrupt and semaphore synchronization.
+ * @brief I2C peripheral driver implementation (interrupt + semaphore based).
+ *
+ * Implements I2C1 initialization, master transmit/receive, and the I2C1 event
+ * and error interrupt handlers.
+ *
+ * @details
+ * Initialization (i2c_init, case i2c1):
+ *   - Creates a binary semaphore for ISR-to-task synchronization.
+ *   - Enables I2C1 clock, resets the peripheral, sets PCLK1 frequency in CR2.
+ *   - Calculates standard-mode CCR and TRISE from the APB1 clock.
+ *   - Enables error interrupts and the I2C peripheral, plus NVIC IRQs.
+ *
+ * Transmit (i2c_master_transmit):
+ *   - Waits for bus idle, sends START + slave address (write), then iterates
+ *     over the TX buffer writing one byte per TXE event, confirming each with
+ *     BTF, and finally issues STOP.
+ *
+ * Receive (i2c_master_receive):
+ *   - Waits for bus idle, sends START + slave address (read), then follows the
+ *     STM32 reference-manual reception sequences for 1-byte, 2-byte, 3-byte,
+ *     and N-byte transfers, managing ACK/NACK and STOP timing.
+ *
+ * ISRs:
+ *   - I2C1_EV_IRQHandler: dispatches SB, ADDR, TXE, RXNE, BTF events using
+ *     the i2c_synch_flags structure to give the semaphore to the blocked task.
+ *   - I2C1_ER_IRQHandler: clears BERR, ARLO, AF, OVR, TIMEOUT, SMBALERT.
+ *
+ * @see i2c.h for the public API, macros, and synchronization flag structure.
  */
 
 #include "i2c.h"

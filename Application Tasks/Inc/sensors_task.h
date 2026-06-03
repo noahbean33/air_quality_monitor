@@ -1,7 +1,35 @@
-/*
- * sensors_task.h
+/**
+ * @file sensors_task.h
  *
- * Declares the necessary functions, data structures, and enumerations required by the sensors task.
+ * @brief Sensors Task interface for the Air Quality Monitor system.
+ *
+ * The Sensors task is a periodic FreeRTOS task responsible for reading
+ * environmental data from the Sensirion SGP40 (VOC index) and SHT3x
+ * (temperature and humidity) sensor suite. After each successful measurement
+ * cycle it forwards the data to the Modbus Data Manager task so that the
+ * latest readings are reflected in the Modbus input registers and alarm
+ * evaluation is triggered.
+ *
+ * @details
+ * Key responsibilities:
+ *   - Waits for the MODBUS_INITIALIZED_BIT event before starting measurements
+ *     to guarantee that the register map is ready.
+ *   - Initializes the Sensirion sensor drivers (SGP40 + SHT3x via sensirion API).
+ *   - Periodically samples VOC index, ambient temperature, and humidity at an
+ *     interval read from the Modbus holding registers (dynamically adjustable
+ *     by the Modbus master via the SAMPLING_INTERVAL_UPDATE message).
+ *   - Toggles the USER LED after the VOC sensor warm-up phase completes
+ *     (voc_index != 0) to give a visual heartbeat.
+ *   - Reports sensor read failures to the Error Handler task.
+ *   - Sets the g_sensors_task_ok health flag each cycle so the System Health
+ *     Monitor can verify this task is alive.
+ *
+ * @dependencies
+ *   - error.h              : Common error type.
+ *   - FreeRTOSTasks.h      : Stack size and priority macros.
+ *   - sgp40_voc_index.h (in .c) : Sensirion VOC + RH/T measurement API.
+ *   - modbus_data_mgr_task.h (in .c) : For posting input register updates.
+ *   - system_events.h (in .c) : Event group for Modbus init synchronization.
  */
 
 #ifndef INC_SENSORS_TASK_H_

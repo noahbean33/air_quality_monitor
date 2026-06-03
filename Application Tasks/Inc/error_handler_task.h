@@ -1,7 +1,29 @@
-/*
- * error_handler_task.h
+/**
+ * @file error_handler_task.h
  *
- * Contains the function prototypes and error enumeration for the error handler task.
+ * @brief Error Handler Task interface for the Air Quality Monitor system.
+ *
+ * This module defines the centralized error handling mechanism used across the
+ * entire application. It provides a FreeRTOS task that listens on a message queue
+ * for error event notifications from any task or ISR in the system.
+ *
+ * When an error is received, the handler increments a per-error diagnostic counter
+ * and visually signals the fault by blinking the USER LED in a recognizable pattern.
+ *
+ * @details
+ * Key responsibilities:
+ *   - Defines the complete set of system error/event IDs (event_id_e).
+ *   - Provides thread-safe (error_handler_send_msg) and ISR-safe
+ *     (error_handler_send_msg_from_isr) functions for posting errors.
+ *   - Creates and manages a FreeRTOS queue for asynchronous error delivery.
+ *   - Blinks the USER LED to provide a visual indication of faults.
+ *
+ * @dependencies
+ *   - FreeRTOSTasks.h : Task stack size and priority definitions.
+ *   - FreeRTOS queue API for inter-task communication.
+ *   - gpio.h (in .c) for LED control.
+ *
+ * @note Error event IDs should be expanded in event_id_e as new subsystems are added.
  */
 
 #ifndef INC_ERROR_HANDLER_TASK_H_

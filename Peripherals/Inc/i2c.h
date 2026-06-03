@@ -1,8 +1,30 @@
-/*
- * i2c.h
+/**
+ * @file i2c.h
  *
- *  Contains function prototypes required for I2C initialization, transmitting
- *  and receiving data using interrupts.
+ * @brief I2C peripheral driver interface (interrupt + semaphore based).
+ *
+ * Provides initialization, master-mode transmit, and master-mode receive
+ * functions for the STM32F4 I2C peripherals. All bus events (SB, ADDR, TXE,
+ * RXNE, BTF) are handled in ISR context; the calling task synchronizes via a
+ * per-instance FreeRTOS binary semaphore, keeping the CPU free between events.
+ *
+ * @details
+ * Currently only I2C1 is fully implemented (used for Sensirion SGP40 / SHT3x
+ * sensors). Stubs exist for I2C2 and I2C3.
+ *
+ * Synchronization model:
+ *   1. The driver sets a flag in i2c_synch_flags (e.g., I2C1_WAIT_TXE).
+ *   2. The appropriate interrupt is enabled.
+ *   3. The calling task blocks on xSemaphoreTake() with I2C_TIMEOUT_TICKS.
+ *   4. The ISR checks the flag, clears it, and gives the semaphore.
+ *
+ * Error interrupts (BERR, ARLO, AF, OVR, TIMEOUT, SMBALERT) are enabled
+ * at init time and handled in I2C1_ER_IRQHandler (in i2c.c).
+ *
+ * @dependencies
+ *   - error.h         : Common error return type.
+ *   - FreeRTOSTasks.h : pdMS_TO_TICKS for timeout conversion.
+ *   - mcu.h           : CMSIS I2C_TypeDef and register bit definitions.
  */
 
 #ifndef INC_I2C_H_

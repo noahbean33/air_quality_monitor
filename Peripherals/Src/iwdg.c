@@ -1,7 +1,22 @@
-/*
- * iwdg.c
+/**
+ * @file iwdg.c
  *
- * Contains the necessary functions for implementing the Independent Watchdog (IWDG).
+ * @brief Independent Watchdog (IWDG) driver implementation.
+ *
+ * Implements iwdg_init(), which configures the IWDG for a ~4 s timeout using
+ * the LSI oscillator (32 kHz) and a /128 prescaler.
+ *
+ * @details
+ * Initialization sequence:
+ *   1. Enable the LSI oscillator and wait for it to stabilize.
+ *   2. Unlock the IWDG registers (write access enable).
+ *   3. Set the prescaler to /128.
+ *   4. Calculate and set the reload value for the desired timeout:
+ *      reload = (timeout_ms * LSI_freq) / (prescaler * 1000).
+ *   5. Wait for the prescaler and reload update flags to clear.
+ *   6. Start the watchdog.
+ *
+ * @see iwdg.h for the public API, key definitions, and inline helpers.
  */
 
 #include "iwdg.h"
